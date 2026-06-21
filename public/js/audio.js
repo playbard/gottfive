@@ -12,6 +12,7 @@ const AudioSystem = (() => {
   let bgmSource = null;
   let bgmBuffer = null;
   let currentBgm = null;
+  let bgmLoading = false; // 非同期ロード中の多重実行防止フラグ
   let enabled = true;
   let volumeLevel = 0.7; // 0.0 〜 1.0
 
@@ -56,6 +57,10 @@ const AudioSystem = (() => {
 
   async function playBgm(url) {
     if (!enabled) return;
+    // 同じBGMがすでに再生中、またはロード中なら何もしない
+    if (currentBgm === url && (bgmSource || bgmLoading)) return;
+
+    bgmLoading = true;
     const c = getCtx();
     if (c.state === 'suspended') await c.resume();
 
@@ -67,21 +72,20 @@ const AudioSystem = (() => {
     // キャッシュ確認
     let buf = bufferCache[url];
     if (buf instanceof ArrayBuffer) {
-      // まだデコードされていない場合はデコード
       buf = await c.decodeAudioData(buf);
       bufferCache[url] = buf;
     } else if (!buf) {
-      // キャッシュ未ロードなら今ロード
       try {
         const res = await fetch(url);
-        if (!res.ok) return;
+        if (!res.ok) { bgmLoading = false; return; }
         const raw = await res.arrayBuffer();
         buf = await c.decodeAudioData(raw);
         bufferCache[url] = buf;
-      } catch { return; }
+      } catch { bgmLoading = false; return; }
     }
 
     currentBgm = url;
+    bgmLoading = false;
     startBgmBuffer(buf);
   }
 
@@ -99,6 +103,8 @@ const AudioSystem = (() => {
       try { bgmSource.stop(); } catch {}
       bgmSource = null;
     }
+    currentBgm = null;
+    bgmLoading = false;
   }
 
   // ========== SE生成ユーティリティ ==========

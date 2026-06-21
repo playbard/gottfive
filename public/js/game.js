@@ -37,10 +37,7 @@ function updateAudioBtn(btn, enabled) {
 AudioSystem.preloadBgm('/audio/bgm_game.mp3');
 AudioSystem.preloadBgm('/audio/bgm_lobby.mp3');
 
-document.addEventListener('click', () => {
-  AudioSystem.resume();
-  if (AudioSystem.getEnabled()) AudioSystem.playBgm('/audio/bgm_game.mp3');
-}, { once: true });
+// BGMはgame_state受信時に開始するため、clickハンドラは不要
 
 initGameAudio();
 
@@ -493,8 +490,9 @@ socket.on('game_state', ({ state, myId: id }) => {
   if (!document.getElementById('gameBoard').hasChildNodes()) {
     initGameBoard();
   }
-  // 初回受信時にBGMをできるだけ早く開始（ロビーのクリックでキャッシュ済みのため即再生）
+  // 未再生の場合のみBGM開始（再生中は呼ばない＝AudioSystem内でガード済み）
   if (AudioSystem.getEnabled()) AudioSystem.playBgm('/audio/bgm_game.mp3');
+
   render(state);
 });
 
@@ -595,8 +593,16 @@ function getNumbersForColor(color) {
 // 初期化・再接続時に常にルームへ再参加
 const playerName = sessionStorage.getItem('playerName');
 
-socket.on('connect', () => {
+function doRejoin() {
   if (roomCode && playerName) {
     socket.emit('rejoin_game', { roomCode, playerName });
   }
+}
+
+socket.on('connect', () => {
+  doRejoin();
 });
+
+// 初回接続でgame_stateが届かなかった場合のリトライ（2秒・5秒後）
+setTimeout(() => { if (!gameState) doRejoin(); }, 2000);
+setTimeout(() => { if (!gameState) doRejoin(); }, 5000);
