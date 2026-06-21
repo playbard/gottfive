@@ -215,7 +215,6 @@ function renderField(state) {
     if (isMyTurn && isFlipPhase && tiles.length > 0) {
       col.classList.add('clickable');
       col.addEventListener('click', () => {
-        AudioSystem.seFlipTile();
         socket.emit('flip_tile_color', { color });
       });
     }
@@ -361,7 +360,6 @@ btnCancelSelect.addEventListener('click', () => {
 
 btnPosition.addEventListener('click', () => {
   if (!selectedFaceUpTile) return;
-  AudioSystem.seAnswerPosition();
   socket.emit('ask_position', { tileNumber: selectedFaceUpTile.number });
   selectedFaceUpTile = null;
   questionChoice.classList.add('hidden');
@@ -469,19 +467,32 @@ socket.on('game_state', ({ state, myId: id }) => {
 
   // 前回stateと比較してSEを判定
   if (gameState) {
-    // 点数質問SE：新規dotsTileがあれば再生
-    const me = state.players.find(p => p.id === myId);
-    const prevMe = gameState.players.find(p => p.id === myId);
-    if (me && prevMe) {
-      me.slots.forEach((slot, i) => {
-        const prev = prevMe.slots[i];
-        if (slot.dotsTiles.length > (prev?.dotsTiles.length || 0)) {
+    // タイル公開SE：表向きタイルが増えた
+    if (state.field.faceUp.length > gameState.field.faceUp.length) {
+      AudioSystem.seFlipTile();
+    }
+
+    // 位置質問SE：いずれかのプレイヤーのpositionTilesが増えた
+    state.players.forEach(p => {
+      const prev = gameState.players.find(pp => pp.id === p.id);
+      if (prev && p.positionTiles.length > prev.positionTiles.length) {
+        AudioSystem.seAnswerPosition();
+      }
+    });
+
+    // 点数質問SE：いずれかのプレイヤーのdotsTileが増えた
+    state.players.forEach(p => {
+      const prev = gameState.players.find(pp => pp.id === p.id);
+      if (!prev) return;
+      p.slots.forEach((slot, i) => {
+        const prevSlot = prev.slots[i];
+        if (slot.dotsTiles.length > (prevSlot?.dotsTiles.length || 0)) {
           const newest = slot.dotsTiles[slot.dotsTiles.length - 1];
           if (newest.match) AudioSystem.seAnswerDotsYes();
           else AudioSystem.seAnswerDotsNo();
         }
       });
-    }
+    });
 
     // 脱落SE：新たにeliminatedになったプレイヤーを検出
     state.players.forEach(p => {
