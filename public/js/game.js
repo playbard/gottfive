@@ -245,6 +245,8 @@ function renderField(state) {
 // ========== スタンド描画 ==========
 function renderStands(state) {
   allStands.innerHTML = '';
+  // プレイヤー数に応じたレイアウトクラスを設定
+  allStands.className = `all-stands layout-${state.players.length}`;
   state.players.forEach(player => {
     const isMe = player.id === myId;
     const standWrap = document.createElement('div');
