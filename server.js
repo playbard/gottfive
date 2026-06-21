@@ -104,22 +104,22 @@ function createGameState(players) {
     }
   }
 
+  // 手番順をシャッフル
+  const shuffledPlayers = shuffle([...players]);
+
   // プレイヤーの手札を昇順ソートしてスロット化
-  const playerStates = players.map((p, i) => {
-    const handTiles = Object.values(playerHands[i]).sort((a, b) => a.number - b.number);
+  const playerStates = shuffledPlayers.map((p, i) => {
+    const originalIndex = players.findIndex(op => op.id === p.id);
+    const handTiles = Object.values(playerHands[originalIndex]).sort((a, b) => a.number - b.number);
     return {
       id: p.id,
       name: p.name,
       eliminated: false,
-      // 初期5枚スロット（インデックス0〜4）
       slots: handTiles.map((tile, si) => ({
         slotIndex: si,
         tile: tile,
-        // 上部に配置された点数タイル
         dotsTiles: [],
       })),
-      // 位置タイル（スロット間に挿入）: { afterSlot: -1〜3, tile, id }
-      // afterSlot: -1 = 先頭より前, 0 = slot0の後, ..., 4 = slot4の後
       positionTiles: [],
     };
   });
@@ -131,7 +131,8 @@ function createGameState(players) {
       faceUp: faceUpTiles,
     },
     currentPlayerIndex: 0,
-    phase: 'flip', // 'flip' | 'question' | 'declare_prompt'
+    phase: 'flip',
+    lastFlippedTileNumber: null, // 最後に公開したタイル番号（ハイライト用）
     status: 'playing',
     turnLog: [],
   };
@@ -342,6 +343,7 @@ io.on('connection', (socket) => {
     tile.id = `fu_${tile.number}`;
     state.field.faceUp.push(tile);
     state.phase = 'question';
+    state.lastFlippedTileNumber = tile.number; // ハイライト用
 
     state.turnLog.push(`${currentPlayer.name} が ${COLOR_JP[color]}の${tile.number}(点${tile.dots}) を公開`);
     broadcastState(room);
@@ -424,6 +426,7 @@ io.on('connection', (socket) => {
 // ターンを次の非脱落プレイヤーへ進める
 function advanceTurn(state, room) {
   state.phase = 'flip';
+  state.lastFlippedTileNumber = null; // ハイライトをクリア
   const total = state.players.length;
   let next = (state.currentPlayerIndex + 1) % total;
   let tries = 0;

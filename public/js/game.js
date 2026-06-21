@@ -228,6 +228,10 @@ function renderField(state) {
   const isQuestionPhase = state.phase === 'question';
   state.field.faceUp.forEach(tile => {
     const el = makeTileEl(tile);
+    // 直前に公開されたタイルをハイライト
+    if (tile.number === state.lastFlippedTileNumber) {
+      el.classList.add('tile-newly-flipped');
+    }
     if (isMyTurn && isQuestionPhase) {
       el.classList.add('clickable');
       if (selectedFaceUpTile && selectedFaceUpTile.number === tile.number) {
@@ -542,11 +546,14 @@ retryBtn.addEventListener('click', () => {
 });
 
 socket.on('game_retry', () => {
-  // サーバーから新ゲーム開始の通知→モーダルを閉じてゲームボードをリセット
   gameOverModal.classList.add('hidden');
   gameState = null;
   selectedFaceUpTile = null;
   pendingQuestion = null;
+  // ゲームボードのメモ（localStorage）をリセット
+  Object.keys(localStorage)
+    .filter(k => k.startsWith(`gf_board_${roomCode}_`))
+    .forEach(k => localStorage.removeItem(k));
   document.getElementById('gameBoard').innerHTML = '';
   AudioSystem.playBgm('/audio/bgm_game.mp3');
 });
