@@ -188,8 +188,8 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 }
 
 /* 表向きエリア */
-.faceup-section { flex-shrink: 0; }
-.faceup-row { display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+.faceup-section { flex-shrink: 0; min-height: 80px; }
+.faceup-row { display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; min-height: 72px; }
 
 /* 新規公開タイルのハイライト */
 .tile-newly-flipped {
@@ -342,14 +342,16 @@ input[type="number"]::-webkit-outer-spin-button { display: none; }
 .board-num  { font-size: 0.72rem; font-weight: bold; line-height: 1; }
 .board-dots { font-size: 0.5rem; line-height: 1; }
 
-/* セル状態オーバーレイ */
+/* セル状態オーバーレイ（✖/△を背面・数字を前面） */
 .board-overlay {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.5rem; font-weight: 300; border-radius: 2px;
+  z-index: 0;
 }
-.state-x        .board-overlay { background: rgba(0,0,0,0.22); color: #e74c3c; }
-.state-triangle .board-overlay { background: rgba(0,0,0,0.15); color: #f1c40f; }
+.state-x        .board-overlay { background: rgba(180,30,30,0.25); color: #e74c3c; }
+.state-triangle .board-overlay { background: rgba(200,160,0,0.18); color: #f1c40f; }
+.board-num, .board-dots { position: relative; z-index: 1; }
 
 /* ========== 音量コントロール ========== */
 .top-bar {

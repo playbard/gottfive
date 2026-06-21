@@ -149,7 +149,7 @@ function applyCellState(cell, state) {
   const ov = document.createElement('span');
   ov.className = 'board-overlay';
   ov.textContent = symbols[state];
-  cell.appendChild(ov);
+  cell.prepend(ov);
 }
 
 function getStoredCellState(num) {
@@ -550,6 +550,8 @@ socket.on('game_retry', () => {
   gameState = null;
   selectedFaceUpTile = null;
   pendingQuestion = null;
+  // ゴットファイブ宣言欄をリセット
+  [0,1,2,3,4].forEach(i => { document.getElementById(`dec${i}`).value = ''; });
   // ゲームボードのメモ（localStorage）をリセット
   Object.keys(localStorage)
     .filter(k => k.startsWith(`gf_board_${roomCode}_`))
