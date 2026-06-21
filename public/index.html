@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゴットファイブ！</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="lobby-body">
+  <div class="lobby-container">
+    <h1 class="lobby-title">ゴット<span>ファイブ！</span></h1>
+    <p class="lobby-subtitle">自分の5枚の数字を推理して当てろ！</p>
+
+    <div class="lobby-card">
+      <div class="form-group">
+        <label for="playerName">プレイヤー名</label>
+        <input type="text" id="playerName" placeholder="名前を入力" maxlength="10">
+      </div>
+
+      <div class="lobby-actions">
+        <button id="createRoomBtn" class="btn btn-primary">ルームを作成する</button>
+        <div class="divider">または</div>
+        <div class="join-form">
+          <input type="text" id="roomCodeInput" placeholder="ルームコード（4桁）" maxlength="4">
+          <button id="joinRoomBtn" class="btn btn-secondary">参加する</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="waitingRoom" class="waiting-room hidden">
+      <div class="room-code-display">
+        ルームコード：<span id="displayCode"></span>
+        <button id="copyCodeBtn" class="btn-copy">コピー</button>
+      </div>
+      <p class="waiting-hint">このコードを友達に教えてください</p>
+      <div id="playerList" class="player-list"></div>
+      <button id="startGameBtn" class="btn btn-start hidden">ゲームを開始する</button>
+      <p id="waitingMsg" class="waiting-msg">ホストがゲームを開始するまでお待ちください...</p>
+    </div>
+
+    <div id="errorMsg" class="error-msg hidden"></div>
+
+    <div class="lobby-audio">
+      <button id="lobbyAudioToggle" class="btn-audio-toggle" title="音声ON/OFF">🔊</button>
+      <input type="range" id="lobbyVolumeSlider" class="volume-slider" min="0" max="100" value="70" title="音量">
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/lobby.js"></script>
+</body>
+</html>

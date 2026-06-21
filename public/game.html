@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゴットファイブ！- ゲーム</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="game-body">
+
+  <!-- ターンバナー + 音量コントロール -->
+  <div class="top-bar">
+    <div id="turnBanner" class="turn-banner"></div>
+    <div class="audio-controls">
+      <button id="audioToggleBtn" class="btn-audio-toggle" title="音声ON/OFF">🔊</button>
+      <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70" title="音量">
+    </div>
+  </div>
+
+  <!-- メインエリア（場 + スタンド 横並び）-->
+  <div class="game-main">
+
+    <!-- 場のタイルエリア -->
+    <section class="field-section">
+      <div class="facedown-section">
+        <h2 class="section-title">場のタイル（裏向き）</h2>
+        <div id="faceDownArea" class="facedown-cols"></div>
+      </div>
+      <div class="faceup-section">
+        <h2 class="section-title">表向き（質問に使用）</h2>
+        <div id="faceUpArea" class="faceup-row"></div>
+      </div>
+    </section>
+
+    <!-- 全プレイヤーのスタンドエリア -->
+    <section class="stands-section">
+      <h2 class="section-title">スタンド</h2>
+      <div id="allStands" class="all-stands"></div>
+    </section>
+
+  </div>
+
+  <!-- 操作パネル（手番プレイヤーのみ表示） -->
+  <div id="actionPanel" class="action-panel hidden">
+    <div id="stepFlip" class="action-step">
+      <span class="step-label">ステップ1</span>
+      <p>裏向きのタイルを1枚クリックして公開してください</p>
+    </div>
+    <div id="stepQuestion" class="action-step hidden">
+      <span class="step-label">ステップ2</span>
+      <p>表向きのタイルを1枚選び、質問を選んでください</p>
+      <div id="questionChoice" class="question-choice hidden">
+        <button id="btnPosition" class="btn btn-q">A：位置を示してもらう</button>
+        <button id="btnDots" class="btn btn-q">B：点の数を聞く</button>
+        <button id="btnCancelSelect" class="btn btn-cancel-sm">選択解除</button>
+      </div>
+      <div id="dotsSlotSelect" class="dots-slot-select hidden">
+        <p>自分のどのスロット（1〜5）と比べますか？</p>
+        <div id="slotButtons" class="slot-buttons"></div>
+        <button id="btnCancelDots" class="btn btn-cancel-sm">戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ゲームボード（メモシート） -->
+  <div class="gameboard-section">
+    <div class="gameboard-header">
+      <h2 class="section-title">ゲームボード（メモシート）</h2>
+      <div class="gottfive-declare-area">
+        <span class="declare-label">ゴットファイブ！宣言：</span>
+        <input type="number" class="declare-input" id="dec0" min="1" max="60" placeholder="1枚目">
+        <input type="number" class="declare-input" id="dec1" min="1" max="60" placeholder="2枚目">
+        <input type="number" class="declare-input" id="dec2" min="1" max="60" placeholder="3枚目">
+        <input type="number" class="declare-input" id="dec3" min="1" max="60" placeholder="4枚目">
+        <input type="number" class="declare-input" id="dec4" min="1" max="60" placeholder="5枚目">
+        <button id="gottfiveBtn" class="btn btn-gottfive">ゴットファイブ！</button>
+      </div>
+    </div>
+    <div id="gameBoard" class="game-board"></div>
+  </div>
+
+  <!-- ターンログ -->
+  <div class="turn-log-wrap">
+    <div id="turnLog" class="turn-log"></div>
+  </div>
+
+  <!-- ゲーム終了モーダル -->
+  <div id="gameOverModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="gameOverTitle"></h2>
+      <p id="gameOverMsg"></p>
+      <div id="revealedHands" class="revealed-hands"></div>
+      <div class="modal-buttons">
+        <button id="retryBtn" class="btn btn-start hidden">同じメンバーでリトライ</button>
+        <p id="retryWaitMsg" class="retry-wait hidden">ホストがリトライを開始するまでお待ちください...</p>
+        <button id="backToLobbyBtn" class="btn btn-secondary">ロビーに戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 宣言確認ダイアログ -->
+  <div id="confirmModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>ゴットファイブ！宣言確認</h2>
+      <p>以下の数字で宣言しますか？</p>
+      <div id="confirmNumbers" class="confirm-numbers"></div>
+      <div class="modal-buttons">
+        <button id="confirmCancelBtn" class="btn btn-secondary">キャンセル</button>
+        <button id="confirmOkBtn" class="btn btn-gottfive">OK・宣言する！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知トースト -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
