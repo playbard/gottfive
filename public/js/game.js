@@ -121,12 +121,12 @@ function initGameBoard() {
       const dots = getDots(num);
       cell.innerHTML = `<span class="board-num">${num}</span><span class="board-dots">${DOTS_SYMBOL[dots]}</span>`;
 
-      // 状態: 0=初期 1=× 2=△ 3=○
+      // 状態: 0=初期 1=× 2=△
       let cellState = getStoredCellState(num);
       applyCellState(cell, cellState);
 
       cell.addEventListener('click', () => {
-        cellState = (cellState + 1) % 4;
+        cellState = (cellState + 1) % 3;
         storeCellState(num, cellState);
         applyCellState(cell, cellState);
       });
@@ -139,12 +139,12 @@ function initGameBoard() {
 }
 
 function applyCellState(cell, state) {
-  cell.classList.remove('state-x','state-triangle','state-circle');
+  cell.classList.remove('state-x','state-triangle');
   const overlay = cell.querySelector('.board-overlay');
   if (overlay) overlay.remove();
   if (state === 0) return;
-  const symbols = { 1:'✖', 2:'△', 3:'○' };
-  const classes  = { 1:'state-x', 2:'state-triangle', 3:'state-circle' };
+  const symbols = { 1:'✖', 2:'△' };
+  const classes  = { 1:'state-x', 2:'state-triangle' };
   cell.classList.add(classes[state]);
   const ov = document.createElement('span');
   ov.className = 'board-overlay';

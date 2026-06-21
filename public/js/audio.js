@@ -15,8 +15,8 @@ const AudioSystem = (() => {
   let bgmLoading = false; // 非同期ロード中の多重実行防止フラグ
   let enabled = true;
   let volumeLevel = 0.7; // 0.0 〜 1.0
-  const BGM_GAIN = 0.18;  // BGMは控えめ
-  const SE_GAIN  = 1.4;   // SEは派手に
+  const BGM_GAIN = 0.09;  // BGMは控えめ
+  const SE_GAIN  = 2.2;   // SEは派手に
 
   // AudioContextの遅延初期化（ユーザー操作後に生成）
   function getCtx() {
