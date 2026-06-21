@@ -1,4 +1,4 @@
-const socket = io({ transports: ['websocket', 'polling'] });
+const socket = io({ transports: ['websocket', 'polling'], reconnectionDelay: 1000 });
 
 // ========== オーディオ初期化（ロビー）==========
 function initLobbyAudio() {

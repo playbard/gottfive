@@ -592,6 +592,11 @@ function getNumbersForColor(color) {
   return map[color] || [];
 }
 
-// 初期化：ゲーム画面ロード時にルームへ再参加して最新状態を要求
+// 初期化・再接続時に常にルームへ再参加
 const playerName = sessionStorage.getItem('playerName');
-socket.emit('rejoin_game', { roomCode, playerName });
+
+socket.on('connect', () => {
+  if (roomCode && playerName) {
+    socket.emit('rejoin_game', { roomCode, playerName });
+  }
+});

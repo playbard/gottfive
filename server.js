@@ -350,11 +350,12 @@ io.on('connection', (socket) => {
   // ゲーム画面ロード時にルームへ再参加して最新ステートを返す
   socket.on('rejoin_game', ({ roomCode, playerName }) => {
     const room = rooms[roomCode];
-    if (!room || !room.gameState) return;
+    if (!room) { console.log(`rejoin_game: room ${roomCode} not found`); return; }
+    if (!room.gameState) { console.log(`rejoin_game: game not started in room ${roomCode}`); return; }
 
     // 同名プレイヤーのIDを新しいsocket.idに更新
     const player = room.gameState.players.find(p => p.name === playerName);
-    if (!player) return;
+    if (!player) { console.log(`rejoin_game: player ${playerName} not found`); return; }
 
     const oldId = player.id;
     player.id = socket.id;
