@@ -20,9 +20,11 @@ function initLobbyAudio() {
   slider.addEventListener('input', () => {
     AudioSystem.resume();
     AudioSystem.setVolume(slider.value / 100);
+    // スライダー操作でOFFになっていた場合はONに戻すが、BGMは既に再生中のため再起動しない
     if (!AudioSystem.getEnabled()) {
       AudioSystem.setEnabled(true);
       updateToggleBtn(toggle, true);
+      AudioSystem.playBgm('/audio/bgm_lobby.mp3'); // stopBgm後の再開用（再生中はガードされる）
     }
   });
 }
@@ -34,14 +36,17 @@ function updateToggleBtn(btn, enabled) {
 
 // ページロード直後にBGMを先読み（ユーザー操作前でもfetch可能）
 AudioSystem.preloadBgm('/audio/bgm_lobby.mp3');
-AudioSystem.preloadBgm('/audio/bgm_game.mp3'); // ゲーム画面用も先読み
+AudioSystem.preloadBgm('/audio/bgm_game.mp3');
 
-// 最初のユーザー操作でBGM開始（AudioContextはユーザー操作後に解放される）
-document.addEventListener('click', () => {
-  if (AudioSystem.getEnabled()) {
-    AudioSystem.playBgm('/audio/bgm_lobby.mp3');
-  }
-}, { once: true });
+// 最初のユーザー操作を捉えてBGMを即開始
+// capture:true で他のハンドラより先に発火、複数イベントタイプをカバー
+function onFirstInteraction() {
+  AudioSystem.resume();
+  if (AudioSystem.getEnabled()) AudioSystem.playBgm('/audio/bgm_lobby.mp3');
+}
+['mousedown', 'keydown', 'touchstart'].forEach(type => {
+  document.addEventListener(type, onFirstInteraction, { once: true, capture: true });
+});
 
 initLobbyAudio();
 
